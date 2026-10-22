@@ -1,284 +1,207 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VIGIA — Simulador de Investigação de Surtos</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIGIA — Laboratório de Investigação de Surtos</title>
 <style>
-:root{
-  --bg:#071019;--panel:#0d1823;--panel2:#122130;--line:#24384a;--text:#edf5fb;
-  --muted:#9eb0bf;--accent:#62d0b4;--accent2:#79a9ff;--warn:#ffd166;--bad:#ff7b7b;
-  --good:#7be0a3;--shadow:0 18px 50px rgba(0,0,0,.28);--r:18px
-}
-*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#061019,#09141f 45%,#071019);
-color:var(--text);font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button{font:inherit}.wrap{max-width:1440px;margin:auto;padding:22px}
-header{display:flex;gap:18px;align-items:center;justify-content:space-between;margin-bottom:18px}
-.brand{display:flex;gap:14px;align-items:center}.logo{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;
-background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04131a;font-weight:900;font-size:22px;box-shadow:var(--shadow)}
-h1{font-size:clamp(22px,3vw,34px);margin:0}.sub{color:var(--muted);margin-top:3px}
-.pill{border:1px solid var(--line);background:#0b1721;border-radius:999px;padding:8px 12px;color:var(--muted);white-space:nowrap}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px}
-.card{background:rgba(13,24,35,.95);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
-.main{padding:24px}.side{padding:18px;position:sticky;top:18px;height:max-content}
-.kicker{text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-size:12px;font-weight:800}
-h2{font-size:clamp(24px,3vw,38px);line-height:1.12;margin:7px 0 10px} h3{margin:0 0 10px;font-size:18px}
-.lead{font-size:18px;color:#d8e5ee;max-width:900px}.muted{color:var(--muted)}
-.alert{padding:15px 17px;border-radius:14px;background:#102436;border:1px solid #294863;margin:18px 0}
-.options{display:grid;gap:11px;margin-top:20px}.opt{width:100%;text-align:left;padding:15px 16px;border-radius:14px;border:1px solid var(--line);
-background:#0b1722;color:var(--text);cursor:pointer;transition:.15s}.opt:hover{transform:translateY(-1px);border-color:#50708b;background:#102131}
-.opt b{display:block;margin-bottom:3px}.opt span{color:var(--muted);font-size:14px}
-.opt:disabled{opacity:.62;cursor:not-allowed;transform:none}.feedback{margin-top:18px;padding:17px;border-radius:14px;border:1px solid var(--line);display:none}
-.feedback.good{display:block;background:#0e2a22;border-color:#275f4b}.feedback.ok{display:block;background:#2a2513;border-color:#6b5b20}
-.feedback.bad{display:block;background:#2d171a;border-color:#6c3036}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer}.primary{background:var(--accent);color:#052019}
-.secondary{background:#152535;color:var(--text);border:1px solid var(--line)}.danger{background:#2b171a;color:#ffdede;border:1px solid #613137}
-.metric{margin:12px 0}.metric-top{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}.bar{height:8px;background:#08111a;border-radius:99px;overflow:hidden;margin-top:6px}
-.fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:.3s}
-.resources{display:grid;grid-template-columns:1fr 1fr;gap:8px}.res{padding:10px;border-radius:12px;background:#0a151f;border:1px solid var(--line)}
-.res small{display:block;color:var(--muted)}.res strong{font-size:18px}.tools{display:grid;gap:8px}.tool{padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:#0a151f}
-.tool.lock{opacity:.42;filter:saturate(.4)}.tool small{display:block;color:var(--muted)}
-.sep{height:1px;background:var(--line);margin:17px 0}.timeline{display:flex;gap:7px;margin:16px 0 22px;overflow:auto;padding-bottom:3px}
-.step{min-width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#0a151f;border:1px solid var(--line);color:var(--muted);font-size:13px}
-.step.done{background:#12342b;border-color:#2c725d;color:#cffff1}.step.now{outline:2px solid var(--accent);color:white}
-.data-box{display:none;margin-top:18px;padding:16px;border-radius:14px;background:#09151f;border:1px solid var(--line)}
-.data-box.show{display:block}.mini-table{width:100%;border-collapse:collapse;font-size:14px}.mini-table th,.mini-table td{padding:8px;border-bottom:1px solid var(--line);text-align:left}
-.spark{display:flex;align-items:end;gap:4px;height:110px;margin:15px 0}.spark i{display:block;flex:1;min-width:10px;background:linear-gradient(var(--accent2),var(--accent));border-radius:5px 5px 1px 1px}
-.badge{display:inline-block;border:1px solid var(--line);padding:4px 8px;border-radius:999px;color:var(--muted);font-size:12px;margin-right:5px}
-.start{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:22px}.case{padding:18px;border:1px solid var(--line);border-radius:16px;background:#0b1722}
-.case.lock{opacity:.55}.case h3{font-size:20px}.case .btn{margin-top:12px;width:100%}
-.debrief{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0}.score{padding:14px;border:1px solid var(--line);border-radius:14px;text-align:center;background:#09151f}
-.score strong{display:block;font-size:25px}.score small{color:var(--muted)}
-.note{font-size:13px;color:var(--muted)}.hidden{display:none!important}
-@media(max-width:1000px){.grid{grid-template-columns:1fr}.side{position:static}.start{grid-template-columns:1fr}.debrief{grid-template-columns:1fr 1fr}.pill{display:none}}
+:root{--bg:#061019;--p:#0c1823;--p2:#102131;--line:#263b4d;--txt:#eef6fb;--mut:#9db0bf;--a:#63d4b5;--b:#80aaff;--w:#ffd166;--r:#ff8080;--g:#7ce2a4}
+*{box-sizing:border-box}body{margin:0;background:#07111a;color:var(--txt);font:15px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select{font:inherit}.app{max-width:1600px;margin:auto;padding:16px}.top{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:14px}
+.brand{display:flex;gap:11px;align-items:center}.logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;color:#041319;font-weight:900;font-size:21px}
+h1{font-size:24px;margin:0}.mut{color:var(--mut)}.layout{display:grid;grid-template-columns:260px minmax(0,1fr) 340px;gap:13px}.card{background:var(--p);border:1px solid var(--line);border-radius:16px}
+.left,.right{padding:14px;height:max-content;position:sticky;top:12px}.center{padding:20px;min-height:760px}
+.nav button{width:100%;text-align:left;border:1px solid transparent;background:transparent;color:var(--txt);padding:10px;border-radius:10px;cursor:pointer;margin:2px 0}
+.nav button:hover,.nav button.active{background:var(--p2);border-color:var(--line)}.nav small{display:block;color:var(--mut)}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.stat{background:#09151f;border:1px solid var(--line);border-radius:11px;padding:9px}.stat small{display:block;color:var(--mut)}.stat b{font-size:18px}
+.sep{height:1px;background:var(--line);margin:13px 0}.btn{border:0;border-radius:10px;padding:10px 12px;font-weight:750;cursor:pointer}.primary{background:var(--a);color:#062019}.secondary{background:#152637;color:var(--txt);border:1px solid var(--line)}.warn{background:#352c12;color:#ffe9a4;border:1px solid #6c5a22}.danger{background:#32191d;color:#ffd9dc;border:1px solid #653139}
+.row{display:flex;gap:9px;flex-wrap:wrap}.hero{padding:17px;background:linear-gradient(135deg,#10283a,#10231f);border:1px solid #315169;border-radius:15px;margin-bottom:16px}
+.hero h2{font-size:29px;margin:3px 0 7px}.k{color:var(--a);font-size:12px;text-transform:uppercase;letter-spacing:.11em;font-weight:800}
+.actiongrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.action{background:#0a1721;border:1px solid var(--line);border-radius:13px;padding:13px;cursor:pointer}.action:hover{border-color:#57758d}.action b{display:block}.action small{color:var(--mut)}
+.log{max-height:250px;overflow:auto;font-size:13px}.log div{padding:7px 0;border-bottom:1px solid #1c2c39}.tag{display:inline-block;padding:3px 7px;border:1px solid var(--line);border-radius:99px;font-size:11px;color:var(--mut);margin:2px}
+.panel{padding:15px;background:#09151f;border:1px solid var(--line);border-radius:13px;margin:12px 0}.panel h3{margin:0 0 8px}.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.qitem{padding:10px;border:1px solid var(--line);border-radius:11px;background:#0c1a26}
+.qitem label{display:flex;gap:8px;align-items:flex-start}.cost{color:var(--w);font-size:12px}.good{color:var(--g)}.bad{color:var(--r)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:7px;border-bottom:1px solid var(--line);text-align:left}th{color:#bdd0dd}
+input[type=number],select{background:#07131d;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px}.meter{margin:8px 0}.meterhead{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}.bar{height:7px;background:#07121a;border-radius:9px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--b),var(--a))}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;padding:20px;z-index:9}.modal.show{display:grid}.modalbox{max-width:760px;width:100%;background:var(--p);border:1px solid var(--line);border-radius:17px;padding:20px;max-height:88vh;overflow:auto}
+.hidden{display:none}.notice{padding:11px 13px;border-left:3px solid var(--w);background:#221f13;border-radius:8px;margin:10px 0}.success{border-left-color:var(--g);background:#10241c}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.left,.right{position:static}.actiongrid{grid-template-columns:1fr 1fr}}@media(max-width:650px){.actiongrid,.qgrid{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
-<div class="wrap">
-<header>
-  <div class="brand"><div class="logo">V</div><div><h1>VIGIA</h1><div class="sub">Simulador de Investigação de Surtos e Vigilância Epidemiológica</div></div></div>
-  <div class="pill" id="modePill">Modo investigação • protótipo funcional</div>
-</header>
-
-<div id="home" class="card main">
-  <div class="kicker">Aprendizagem baseada em decisão</div>
-  <h2>Investigue antes que o evento avance.</h2>
-  <p class="lead">Você recebe sinais incompletos, administra recursos limitados, constrói a investigação e decide quando agir. O objetivo não é adivinhar um desenho de estudo: é tomar decisões epidemiológicas defensáveis no tempo certo.</p>
-  <div class="alert"><b>Como funciona:</b> cada decisão altera tempo, orçamento, capacidade da equipe e qualidade da investigação. Recursos da Sala de Situação são desbloqueados conforme você produz informação.</div>
-  <div class="start">
-    <div class="case">
-      <span class="badge">Introdutório</span><span class="badge">Surto alimentar</span>
-      <h3>Almoço na Escola Horizonte</h3>
-      <p class="muted">Vômitos e diarreia em estudantes após uma atividade escolar. Trabalhe alerta, definição de caso, linha de casos, curva epidêmica, hipótese, coorte retrospectiva e controle.</p>
-      <button class="btn primary" onclick="startGame()">Iniciar investigação</button>
-    </div>
-    <div class="case lock">
-      <span class="badge">Intermediário</span><span class="badge">Respiratório</span>
-      <h3>Instituição de longa permanência</h3>
-      <p class="muted">Cluster respiratório, busca ativa, testagem, isolamento, contatos e monitoramento.</p>
-      <button class="btn secondary" disabled>Em desenvolvimento</button>
-    </div>
-    <div class="case lock">
-      <span class="badge">Avançado</span><span class="badge">Sarampo</span>
-      <h3>Caso importado e contatos</h3>
-      <p class="muted">Notificação imediata, período de transmissibilidade, contatos, vacinação e vigilância ativa.</p>
-      <button class="btn secondary" disabled>Em desenvolvimento</button>
-    </div>
-  </div>
-</div>
-
-<div id="game" class="grid hidden">
-  <main class="card main">
-    <div class="timeline" id="timeline"></div>
-    <div class="kicker" id="phase"></div>
-    <h2 id="title"></h2>
-    <p class="lead" id="story"></p>
-    <div id="context" class="alert"></div>
-    <div id="dataBox" class="data-box"></div>
-    <div id="options" class="options"></div>
-    <div id="feedback" class="feedback"></div>
-    <div class="actions">
-      <button id="nextBtn" class="btn primary hidden" onclick="nextStep()">Continuar</button>
-      <button class="btn secondary" onclick="toggleResource()">Abrir recurso disponível</button>
-      <button class="btn danger" onclick="restart()">Reiniciar caso</button>
-    </div>
-  </main>
-
-  <aside class="card side">
-    <h3>Sala de Situação</h3>
-    <div class="resources">
-      <div class="res"><small>Tempo decorrido</small><strong id="rTime">0 h</strong></div>
-      <div class="res"><small>Orçamento</small><strong id="rMoney">100</strong></div>
-      <div class="res"><small>Equipe</small><strong id="rTeam">100</strong></div>
-      <div class="res"><small>Amostras lab.</small><strong id="rLab">12</strong></div>
-    </div>
-    <div class="sep"></div>
-    <h3>Desempenho</h3>
-    <div id="metrics"></div>
-    <div class="sep"></div>
-    <h3>Recursos de investigação</h3>
-    <div class="tools" id="tools"></div>
-    <p class="note">Recursos são desbloqueados pela investigação. Nem todo recurso precisa ser usado; solicitar informação desnecessária também tem custo.</p>
-  </aside>
-</div>
-</div>
-
+<body><div class="app">
+<div class="top"><div class="brand"><div class="logo">V</div><div><h1>VIGIA</h1><div class="mut">Laboratório de investigação de surtos • cenário aberto</div></div></div><button class="btn secondary" onclick="resetGame()">Novo caso</button></div>
+<div class="layout">
+<aside class="card left">
+ <b>Áreas de trabalho</b><div class="nav" id="nav"></div>
+ <div class="sep"></div><div class="mut" style="font-size:12px">O jogo não informa a sequência correta. Você decide o que investigar, quando gastar e quando agir.</div>
+</aside>
+<main class="card center" id="view"></main>
+<aside class="card right">
+ <b>Recursos</b><div class="statgrid" style="margin-top:9px">
+  <div class="stat"><small>Orçamento</small><b id="money">R$ 8.000</b></div><div class="stat"><small>Tempo do cenário</small><b id="time">Dia 1</b></div>
+  <div class="stat"><small>Equipe disponível</small><b id="team">4</b></div><div class="stat"><small>Entrevistas</small><b id="ints">0</b></div>
+ </div>
+ <div class="panel" style="margin-top:9px"><b>Relógio da simulação</b><br><span class="mut">1 minuto de tempo real = 1 dia no cenário.</span><br><span class="cost">O surto continua evoluindo enquanto você decide.</span></div><div class="sep"></div><b>Qualidade da investigação</b><div id="meters"></div>
+ <div class="sep"></div><b>Diário de campo</b><div class="log" id="log"></div>
+</aside>
+</div></div>
+<div class="modal" id="modal"><div class="modalbox" id="modalbox"></div></div>
 <script>
-const metricNames={vig:"Vigilância",rig:"Rigor epidemiológico",opp:"Oportunidade",ctrl:"Controle",eff:"Uso de recursos"};
-const toolDefs=[
- {id:"alerta",name:"Registro do alerta",desc:"Origem, horário e informação inicial"},
- {id:"linha",name:"Linha de casos",desc:"Pessoa, lugar, tempo, clínica e exposições"},
- {id:"curva",name:"Curva epidêmica",desc:"Distribuição dos casos por início dos sintomas"},
- {id:"mapa",name:"Mapa / lugar",desc:"Distribuição espacial e locais de exposição"},
- {id:"lab",name:"Laboratório",desc:"Amostras e resultados disponíveis"},
- {id:"entrevista",name:"Entrevistas",desc:"Exposições e informações qualitativas"},
- {id:"analise",name:"Análise epidemiológica",desc:"Taxas de ataque e medidas de associação"},
- {id:"controle",name:"Medidas de controle",desc:"Ações implementadas e monitoramento"}
+const fmt=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
+const clamp=n=>Math.max(0,Math.min(100,n));
+const questionnaire=[
+ {id:"id",n:"Identificação e contato",cost:0,core:true,desc:"Nome/código, idade, contato."},
+ {id:"onset",n:"Data e hora de início dos sintomas",cost:2,core:true,desc:"Permite caracterização temporal e curva epidêmica."},
+ {id:"symptoms",n:"Sintomas e gravidade",cost:2,core:true,desc:"Apoia definição de caso e espectro clínico."},
+ {id:"attendance",n:"Participação no evento",cost:1,core:true,desc:"Confirma população sob risco."},
+ {id:"foods",n:"Consumo de cada alimento e bebida",cost:5,core:true,desc:"Necessário para testar hipóteses alimentares."},
+ {id:"amount",n:"Quantidade aproximada consumida",cost:4,desc:"Pode explorar gradiente dose–resposta, mas aumenta carga e erro de recordação."},
+ {id:"table",n:"Mesa/local onde sentou",cost:2,desc:"Pode ajudar a explorar distribuição espacial."},
+ {id:"contacts",n:"Contato com pessoas sintomáticas",cost:3,desc:"Útil para hipótese de transmissão pessoa a pessoa."},
+ {id:"water",n:"Consumo de água no evento",cost:2,desc:"Exposição alternativa plausível."},
+ {id:"prior",n:"Sintomas nos 7 dias anteriores ao evento",cost:3,desc:"Ajuda a reconhecer doença prévia/casos não relacionados."},
+ {id:"meds",n:"Medicamentos em uso",cost:4,desc:"Baixa prioridade para a hipótese inicial; aumenta duração."},
+ {id:"pets",n:"Contato com animais domésticos",cost:4,desc:"Pode ser biologicamente relevante em outros contextos, mas aqui tem baixo rendimento inicial."},
+ {id:"address",n:"Endereço residencial completo",cost:4,desc:"Permite análise espacial residencial, porém pode não corresponder ao local de exposição."},
+ {id:"open",n:"Pergunta aberta: 'O que você acha que causou o adoecimento?'",cost:4,desc:"Pode revelar exposições não previstas, mas também introduzir hipóteses influenciadas por rumores."}
 ];
-
-const steps=[
-{
- phase:"1 • Alerta e verificação", title:"Um telefonema chega à vigilância",
- story:"Segunda-feira, 08h10. A direção da Escola Horizonte informa que 14 estudantes apresentaram vômitos e diarreia desde a noite anterior. No sábado, 96 estudantes e 8 trabalhadores participaram de uma atividade com almoço coletivo.",
- context:"Você ainda não sabe se todos os casos estão relacionados, qual é o agente ou se o número observado excede o esperado.",
- unlock:["alerta"],
- options:[
-  {t:"Registrar o alerta, obter informações mínimas e iniciar verificação do evento",s:"Define pessoa, lugar, tempo, sintomas, gravidade e contatos iniciais antes de mobilizar toda a resposta.",q:"good",d:{time:1,money:-2,team:-3,vig:8,rig:5,opp:7,eff:5}},
-  {t:"Aguardar confirmação laboratorial antes de iniciar a investigação",s:"A confirmação etiológica pode ser importante, mas não é pré-requisito para verificar um possível surto nem para iniciar ações oportunas.",q:"bad",d:{time:12,opp:-14,vig:-7,eff:1}},
-  {t:"Enviar imediatamente toda a equipe para coletar amostras de todos os participantes",s:"Mobilização precoce e indiscriminada consome capacidade antes de definir quem deve ser investigado e quais amostras são informativas.",q:"ok",d:{time:3,money:-15,team:-15,lab:-6,opp:2,eff:-12}}
- ]},
-{
- phase:"2 • Definição de caso", title:"Quem será considerado caso?",
- story:"A verificação confirma quadro gastrointestinal agudo em vários participantes do mesmo evento. Há pessoas com apenas náusea e outras com vômitos e/ou diarreia.",
- context:"A definição deve ser operacional, aplicável à busca ativa e suficientemente específica para esta etapa, sem depender obrigatoriamente do laboratório.",
- unlock:["linha"],
- options:[
-  {t:"Participante do evento de sábado que apresentou vômito e/ou ≥3 evacuações líquidas em 24 h, com início entre sábado à tarde e terça-feira",s:"Combina pessoa, lugar/exposição, critérios clínicos e tempo. Pode ser refinada à medida que novas informações surgirem.",q:"good",d:{time:1,rig:10,vig:7,opp:4,eff:3}},
-  {t:"Qualquer morador do bairro com sintomas gastrointestinais nesta semana",s:"A definição é ampla demais para a investigação inicial e pode incorporar casos não relacionados ao evento.",q:"bad",d:{time:2,rig:-10,team:-6,eff:-5}},
-  {t:"Somente participante com exame laboratorial positivo",s:"Alta especificidade, porém baixa sensibilidade operacional no início; atrasaria a busca ativa e excluiria casos epidemiologicamente compatíveis.",q:"ok",d:{time:6,rig:-2,opp:-8,vig:-4}}
- ]},
-{
- phase:"3 • Busca ativa e descrição", title:"Como encontrar a extensão real do evento?",
- story:"A escola fornece lista nominal dos 104 participantes, telefones, turma/setor e cardápio servido. Até agora, somente famílias que procuraram a escola foram contabilizadas.",
- context:"Você pode organizar uma busca ativa estruturada. A lista completa dos participantes também cria um denominador conhecido.",
- unlock:["entrevista","curva"],
- data:"line",
- options:[
-  {t:"Contatar sistematicamente os 104 participantes usando formulário padronizado e registrar doentes e não doentes",s:"A estratégia reduz viés de seleção, identifica denominadores e permite comparar exposições entre participantes.",q:"good",d:{time:8,money:-8,team:-18,vig:10,rig:10,opp:4,eff:4}},
-  {t:"Entrevistar apenas os 14 casos já conhecidos",s:"Ajuda a descrever os doentes, mas impede estimar taxas de ataque por exposição e pode perder casos que não procuraram a escola.",q:"ok",d:{time:3,team:-5,rig:-5,vig:-4,eff:2}},
-  {t:"Publicar um formulário aberto nas redes sociais e usar apenas respostas espontâneas",s:"Pode gerar seleção difícil de quantificar e perde o denominador definido do evento, que já está disponível.",q:"bad",d:{time:5,money:-2,rig:-11,vig:-5,eff:-4}}
- ]},
-{
- phase:"4 • Tempo, pessoa e lugar", title:"Os dados começam a formar um padrão",
- story:"A busca ativa identifica 47 pessoas que atendem à definição de caso. A maioria iniciou sintomas entre 8 e 20 horas após o almoço. Não houve concentração clara por turma.",
- context:"Antes de testar hipóteses, descreva o evento. A curva epidêmica e a distribuição das exposições podem orientar a investigação.",
- unlock:["mapa"],
- data:"curve",
- options:[
-  {t:"Interpretar o padrão temporal, caracterizar pessoa e lugar e então formular hipóteses de fonte comum",s:"A concentração dos inícios em intervalo relativamente curto após uma exposição compartilhada é compatível com fonte comum pontual e orienta as hipóteses.",q:"good",d:{time:2,rig:9,vig:6,opp:4}},
-  {t:"Concluir que o alimento foi a causa apenas porque houve almoço coletivo",s:"O almoço é uma hipótese plausível, não uma conclusão. É necessário examinar exposições específicas e evidências epidemiológicas/laboratoriais.",q:"bad",d:{time:1,rig:-12,ctrl:-3}},
-  {t:"Ignorar o tempo de início e comparar somente o número de casos por turma",s:"Perde-se uma dimensão essencial para compreender o padrão de transmissão e orientar hipóteses.",q:"bad",d:{time:2,rig:-9,vig:-5}}
- ]},
-{
- phase:"5 • Hipóteses e laboratório", title:"Qual informação vale coletar agora?",
- story:"Entrevistas apontam que salada de maionese, frango, arroz, feijão e suco foram servidos. Parte dos trabalhadores da cozinha guardou sobras refrigeradas. Alguns casos ainda estão sintomáticos.",
- context:"Você dispõe de 12 unidades de capacidade laboratorial. O laboratório pode apoiar a investigação, mas não substitui a análise epidemiológica.",
- unlock:["lab"],
- options:[
-  {t:"Priorizar amostras clínicas oportunas de alguns casos e amostras de alimentos remanescentes pertinentes, articulando com o laboratório",s:"Amostragem dirigida preserva recursos e aumenta a chance de produzir informação útil, respeitando oportunidade e pertinência da coleta.",q:"good",d:{time:3,money:-12,team:-5,lab:-7,rig:7,opp:4,eff:8}},
-  {t:"Coletar 12 amostras aleatórias, independentemente de sintomas, tempo e tipo de material",s:"Usar toda a capacidade não significa produzir mais evidência. A escolha do material e do momento de coleta é parte da estratégia.",q:"bad",d:{time:5,money:-18,team:-8,lab:-12,rig:-7,eff:-12}},
-  {t:"Não coletar nenhuma amostra porque a epidemiologia será suficiente",s:"A investigação epidemiológica pode sustentar medidas, mas a oportunidade de obter evidência laboratorial relevante não deve ser descartada sem justificativa.",q:"ok",d:{time:1,money:0,rig:-3,eff:3}}
- ]},
-{
- phase:"6 • Investigação analítica", title:"Como testar a hipótese?",
- story:"Você tem a lista completa de participantes, sabe quem adoeceu e dispõe das exposições alimentares de doentes e não doentes.",
- context:"A pergunta agora é analítica: qual alimento está associado ao adoecimento entre os participantes do evento?",
- unlock:["analise"],
- data:"attack",
- options:[
-  {t:"Realizar uma coorte retrospectiva e comparar taxas de ataque entre expostos e não expostos, estimando risco relativo",s:"A população exposta está enumerada e o status de exposição e desfecho pode ser reconstruído. O RR é diretamente interpretável neste cenário.",q:"good",d:{time:5,team:-8,rig:12,vig:4,eff:6}},
-  {t:"Fazer um estudo ecológico usando cada turma como unidade de análise",s:"É possível estudar grupos, mas isso desperdiça informação individual disponível e introduz limitações desnecessárias para esta pergunta.",q:"ok",d:{time:4,rig:-6,eff:-4}},
-  {t:"Selecionar apenas casos e calcular a porcentagem que comeu cada alimento",s:"Frequência de exposição entre casos, sem grupo comparável, não estima a associação necessária para discriminar o veículo provável.",q:"bad",d:{time:3,rig:-12,eff:-5}}
- ]},
-{
- phase:"7 • Decisão de controle", title:"Agir agora ou esperar?",
- story:"A análise mostra associação forte com a salada de maionese. A inspeção identifica falha de refrigeração. Resultados laboratoriais definitivos ainda não estão disponíveis.",
- context:"A vigilância precisa equilibrar certeza, proporcionalidade e oportunidade. Medidas de controle podem ser necessárias antes da confirmação etiológica final.",
- unlock:["controle"],
- options:[
-  {t:"Interromper o uso do lote/ingrediente implicado, corrigir a falha de conservação, orientar a escola e manter monitoramento dos casos",s:"As medidas são proporcionais às evidências disponíveis e atuam sobre uma via plausível sem depender de certeza etiológica absoluta.",q:"good",d:{time:2,money:-6,team:-5,ctrl:14,opp:12,vig:5,eff:5}},
-  {t:"Esperar todos os resultados laboratoriais antes de qualquer medida",s:"Atrasar medidas plausíveis diante de evidência epidemiológica consistente pode prolongar a exposição e reduzir a efetividade da resposta.",q:"bad",d:{time:24,opp:-16,ctrl:-12}},
-  {t:"Fechar a escola por 30 dias sem avaliação adicional",s:"A medida é desproporcional ao mecanismo sugerido e impõe alto custo sem evidência de benefício adicional.",q:"bad",d:{time:1,money:-25,ctrl:-5,eff:-16}}
- ]},
-{
- phase:"8 • Comunicação e encerramento", title:"Como fechar o ciclo de vigilância?",
- story:"Não surgem novos casos após as medidas. O laboratório detecta agente compatível em amostras clínicas e no alimento remanescente. A escola solicita orientação formal.",
- context:"Encerrar uma investigação inclui comunicação, documentação das evidências, recomendações e critérios de monitoramento.",
- options:[
-  {t:"Consolidar relatório com métodos, achados, limitações, medidas adotadas e recomendações; comunicar envolvidos e definir período de monitoramento",s:"A resposta fecha o ciclo entre detecção, investigação, controle, comunicação e aprendizado institucional.",q:"good",d:{time:4,team:-6,vig:10,rig:5,ctrl:8,eff:3}},
-  {t:"Arquivar o caso porque o agente já foi identificado",s:"A identificação etiológica não substitui documentação, comunicação e avaliação das medidas.",q:"bad",d:{time:1,vig:-10,ctrl:-6}},
-  {t:"Divulgar imediatamente nomes e dados individuais dos casos para demonstrar transparência",s:"Comunicação de risco deve informar o necessário sem exposição indevida de dados pessoais.",q:"bad",d:{time:1,vig:-7,rig:-3}}
- ]}
-];
-
-let state;
-function baseState(){return {i:0,time:0,money:100,team:100,lab:12,metrics:{vig:50,rig:50,opp:50,ctrl:50,eff:50},tools:[],answered:false,history:[]}}
-function clamp(v){return Math.max(0,Math.min(100,v))}
-function startGame(){state=baseState();document.getElementById("home").classList.add("hidden");document.getElementById("game").classList.remove("hidden");render()}
-function restart(){state=baseState();render()}
-function render(){
- const s=steps[state.i]; if(!s){finish();return}
- (s.unlock||[]).forEach(x=>{if(!state.tools.includes(x))state.tools.push(x)});
- document.getElementById("phase").textContent=s.phase;
- document.getElementById("title").textContent=s.title;
- document.getElementById("story").textContent=s.story;
- document.getElementById("context").innerHTML="<b>Situação:</b> "+s.context;
- document.getElementById("feedback").className="feedback";document.getElementById("feedback").innerHTML="";
- document.getElementById("nextBtn").classList.add("hidden");state.answered=false;
- document.getElementById("options").innerHTML=s.options.map((o,j)=>`<button class="opt" onclick="choose(${j})"><b>${String.fromCharCode(65+j)}. ${o.t}</b><span>Escolha esta conduta</span></button>`).join("");
- renderTimeline();renderSide();renderData(s.data,false);
+const S0=()=>({money:8000,time:0,scenarioMinutes:0,clockStartedAt:Date.now(),team:4,trained:false,trainingLevel:0,q:["id","onset","symptoms","attendance"],pilot:false,interviews:0,caseDef:false,line:false,curve:false,analysis:false,inspection:false,lab:0,control:false,reported:false,closed:false,view:"dashboard",
+ quality:{data:50,bias:50,opportunity:70,control:40},log:["08:10 — Escola Horizonte comunica 14 estudantes com vômitos/diarreia após evento de sábado."],rumor:0});
+let s=S0();
+const navs=[["dashboard","Centro de operações"],["questionnaire","Questionário"],["field","Entrevistas de campo"],["epi","Epidemiologia"],["lab","Laboratório"],["inspection","Inspeção ambiental"],["control","Controle e comunicação"],["close","Encerramento"]];
+function spend(v){s.money=Math.max(0,s.money-v)}function tick(h){s.time+=h;s.quality.opportunity=clamp(s.quality.opportunity-Math.max(0,h-2)*.35)}
+function addlog(x){const d=Math.floor(((Date.now()-s.clockStartedAt)/60000)+(s.time/24))+1;s.log.unshift(`Dia ${d} — ${x}`)}
+function applyClockPressure(){
+ const elapsedRealMin=(Date.now()-s.clockStartedAt)/60000;
+ const days=elapsedRealMin + s.time/24;
+ const base=70;
+ s.quality.opportunity=clamp(Math.min(s.quality.opportunity, base-Math.max(0,days-0.25)*3.2));
 }
-function choose(j){
- if(state.answered)return;state.answered=true;
- const s=steps[state.i],o=s.options[j];state.history.push({step:state.i,q:o.q,text:o.t});
- Object.entries(o.d||{}).forEach(([k,v])=>{
-   if(k==="time")state.time+=v; else if(k==="money")state.money=Math.max(0,state.money+v);
-   else if(k==="team")state.team=Math.max(0,state.team+v); else if(k==="lab")state.lab=Math.max(0,state.lab+v);
-   else if(state.metrics[k]!=null)state.metrics[k]=clamp(state.metrics[k]+v)
- });
- document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
- const f=document.getElementById("feedback");f.className="feedback "+o.q;
- f.innerHTML=`<b>${o.q==="good"?"Decisão adequada":o.q==="ok"?"Decisão defensável, com limitações":"Decisão inadequada"}</b><br>${o.s}`;
- document.getElementById("nextBtn").classList.remove("hidden");renderSide();renderData(s.data,true);
+function evolveScenario(){
+ const days=((Date.now()-s.clockStartedAt)/60000)+(s.time/24);
+ if(days>=2 && !s.day2){s.day2=true;s.rumor=1;addlog("Novas famílias relatam sintomas; rumores sobre um alimento específico começam a circular.");}
+ if(days>=3 && !s.day3){s.day3=true;s.quality.data=clamp(s.quality.data-3);addlog("Parte das sobras alimentares foi descartada; a oportunidade de coleta ambiental diminuiu.");}
+ if(days>=4 && !s.day4){s.day4=true;s.quality.bias=clamp(s.quality.bias-4);addlog("Recordação das exposições começa a se deteriorar e participantes discutem entre si possíveis causas.");}
+ if(days>=5 && !s.day5){s.day5=true;s.quality.opportunity=clamp(s.quality.opportunity-8);addlog("A investigação entra em fase tardia; algumas medidas deixam de ter o mesmo valor operacional.");}
 }
-function nextStep(){state.i++;render()}
-function renderTimeline(){document.getElementById("timeline").innerHTML=steps.map((_,i)=>`<div class="step ${i<state.i?"done":i===state.i?"now":""}">${i+1}</div>`).join("")}
-function renderSide(){
- document.getElementById("rTime").textContent=state.time+" h";document.getElementById("rMoney").textContent=state.money;
- document.getElementById("rTeam").textContent=state.team;document.getElementById("rLab").textContent=state.lab;
- document.getElementById("metrics").innerHTML=Object.entries(state.metrics).map(([k,v])=>`<div class="metric"><div class="metric-top"><span>${metricNames[k]}</span><b>${Math.round(v)}</b></div><div class="bar"><div class="fill" style="width:${v}%"></div></div></div>`).join("");
- document.getElementById("tools").innerHTML=toolDefs.map(t=>`<div class="tool ${state.tools.includes(t.id)?"":"lock"}"><b>${state.tools.includes(t.id)?"✓":"🔒"} ${t.name}</b><small>${t.desc}</small></div>`).join("");
+function render(){applyClockPressure();evolveScenario();
+ document.getElementById("money").textContent=fmt(s.money);
+ const elapsedRealMin=(Date.now()-s.clockStartedAt)/60000;
+ s.scenarioMinutes=elapsedRealMin*1440 + s.time*60;
+ const scenDay=Math.floor(s.scenarioMinutes/1440)+1;
+ const scenHour=Math.floor((s.scenarioMinutes%1440)/60);
+ document.getElementById("time").textContent=`Dia ${scenDay} • ${String(scenHour).padStart(2,"0")}h`;document.getElementById("team").textContent=s.team;document.getElementById("ints").textContent=s.interviews;
+ document.getElementById("nav").innerHTML=navs.map(([id,n])=>`<button class="${s.view===id?"active":""}" onclick="go('${id}')"><b>${n}</b><small>${navSub(id)}</small></button>`).join("");
+ document.getElementById("meters").innerHTML=Object.entries(s.quality).map(([k,v])=>`<div class="meter"><div class="meterhead"><span>${({data:"Qualidade dos dados",bias:"Controle de vieses",opportunity:"Oportunidade",control:"Controle do evento"})[k]}</span><b>${Math.round(v)}</b></div><div class="bar"><div class="fill" style="width:${v}%"></div></div></div>`).join("");
+ document.getElementById("log").innerHTML=s.log.map(x=>`<div>${x}</div>`).join("");
+ window["view_"+s.view]();
 }
-function renderData(type,reveal){
- const b=document.getElementById("dataBox"); if(!type){b.className="data-box";b.innerHTML="";return}
- b.className="data-box"+(reveal?" show":"");
- if(type==="line")b.innerHTML=`<h3>Recurso • linha de casos</h3><table class="mini-table"><tr><th>ID</th><th>Início</th><th>Vômitos</th><th>Diarreia</th><th>Maionese</th></tr><tr><td>01</td><td>Sab 22:10</td><td>Sim</td><td>Sim</td><td>Sim</td></tr><tr><td>02</td><td>Dom 00:40</td><td>Sim</td><td>Não</td><td>Sim</td></tr><tr><td>03</td><td>Dom 02:15</td><td>Não</td><td>Sim</td><td>Sim</td></tr></table><p class="note">Trecho ilustrativo. A linha completa contém casos e não casos entrevistados.</p>`;
- if(type==="curve"){let vals=[0,0,1,2,5,9,12,10,5,2,1,0];b.innerHTML=`<h3>Recurso • curva epidêmica</h3><div class="spark">${vals.map(v=>`<i style="height:${8+v*7}px" title="${v} casos"></i>`).join("")}</div><p class="note">Casos por intervalo de início dos sintomas. Observe a concentração temporal após a exposição comum.</p>`}
- if(type==="attack")b.innerHTML=`<h3>Recurso • tabela preliminar de exposição</h3><table class="mini-table"><tr><th>Alimento</th><th>TA expostos</th><th>TA não expostos</th><th>RR preliminar</th></tr><tr><td>Salada de maionese</td><td>72%</td><td>14%</td><td>5,1</td></tr><tr><td>Frango</td><td>48%</td><td>41%</td><td>1,2</td></tr><tr><td>Suco</td><td>46%</td><td>44%</td><td>1,0</td></tr></table><p class="note">Valores didáticos do cenário. A interpretação deve considerar qualidade da coleta, incerteza e plausibilidade epidemiológica.</p>`;
+function navSub(id){return {dashboard:"situação e ações",questionnaire:`${s.q.length} campos selecionados`,field:`${s.interviews} entrevistas`,epi:s.analysis?"análise disponível":"dados e métodos",lab:`${s.lab} amostras`,inspection:s.inspection?"realizada":"não realizada",control:s.control?"medidas ativas":"sem medida específica",close:"debriefing"}[id]}
+function go(v){s.view=v;render()}
+function view_dashboard(){
+ document.getElementById("view").innerHTML=`<div class="hero"><div class="k">Alerta inicial • segunda-feira 08:10</div><h2>14 estudantes adoeceram após atividade escolar</h2><p>96 estudantes e 8 trabalhadores participaram de um evento no sábado. A direção relata vômitos e diarreia. Algumas famílias mencionam o almoço; outras dizem que "há uma virose na escola". Você recebeu somente a comunicação inicial.</p></div>
+ <div class="notice"><b>Tempo correndo:</b> a cada 60 segundos reais passa 1 dia epidemiológico. Decisões demoradas podem significar novos casos, perda de amostras, descarte de alimentos, pior recordação e menor utilidade de algumas ações.</div>
+ <h3>Ações disponíveis agora</h3><div class="actiongrid">
+ ${act("Verificar alerta","Telefonar para direção/unidade de saúde e obter informação mínima.","R$ 80 • 1 h","verify()")}
+ ${act("Treinar entrevistadores","Padronizar abordagem, aplicação do instrumento e registro.","Você escolhe a intensidade","openTraining()")}
+ ${act("Desenhar questionário","Escolher exatamente quais variáveis serão coletadas.","Custo por entrevista varia","go('questionnaire')")}
+ ${act("Iniciar entrevistas","Escolher quantidade, equipe e instrumento atual.","Custo unitário real","go('field')")}
+ ${act("Solicitar inspeção","Avaliação sanitária do local e processos.","R$ 900 • 5 h","doInspection()")}
+ ${act("Acionar laboratório","Planejar coleta e selecionar amostras.","Custo por amostra","go('lab')")}
+ </div>${s.rumor?`<div class="notice">Rumor circulante: familiares estão atribuindo os casos à “maionese”. Isso pode influenciar respostas posteriores se o questionário induzir a exposição.</div>`:""}`;
 }
-function toggleResource(){const b=document.getElementById("dataBox");if(!b.innerHTML){b.innerHTML="<h3>Recursos ainda em construção</h3><p class='muted'>Nesta etapa, consulte os recursos já desbloqueados na Sala de Situação. Dados adicionais aparecem quando são produzidos pela investigação.</p>"}b.classList.toggle("show")}
-function finish(){
- const avg=Math.round(Object.values(state.metrics).reduce((a,b)=>a+b,0)/5);
- const main=document.querySelector("main.main");
- main.innerHTML=`<div class="kicker">Debriefing</div><h2>Investigação encerrada</h2>
- <p class="lead">O evento foi controlado. Agora o objetivo é reconstruir o raciocínio, não apenas contar acertos.</p>
- <div class="debrief">${Object.entries(state.metrics).map(([k,v])=>`<div class="score"><strong>${Math.round(v)}</strong><small>${metricNames[k]}</small></div>`).join("")}</div>
- <div class="alert"><b>Desempenho global: ${avg}/100.</b> Tempo decorrido: ${state.time} h. Orçamento remanescente: ${state.money}. Capacidade laboratorial remanescente: ${state.lab}.</div>
- <h3>Raciocínio epidemiológico esperado</h3>
- <p>A investigação parte da verificação do alerta, constrói definição operacional de caso, realiza busca ativa com denominador conhecido, descreve tempo–pessoa–lugar, formula hipóteses e utiliza uma <b>coorte retrospectiva</b> para comparar taxas de ataque entre expostos e não expostos. As medidas de controle não precisam aguardar certeza etiológica absoluta quando a evidência disponível é suficiente e a ação é proporcional.</p>
- <h3>Recursos produzidos</h3><p class="muted">Registro do alerta • linha de casos • entrevistas • curva epidêmica • análise por lugar • laboratório • taxas de ataque/RR • registro das medidas de controle.</p>
- <div class="actions"><button class="btn primary" onclick="location.reload()">Voltar ao início</button></div>`;
- renderSide();
+function act(a,b,c,fn){return `<div class="action" onclick="${fn}"><b>${a}</b><small>${b}</small><div class="cost">${c}</div></div>`}
+function verify(){if(s.verified)return;s.verified=true;spend(80);tick(1);s.quality.data+=3;addlog("Alerta verificado: casos compatíveis com síndrome gastrointestinal aguda entre participantes do evento.");s.rumor=1;render()}
+function openTraining(){modal(`<h2>Treinamento dos entrevistadores</h2><p class="mut">Treinar custa dinheiro e tempo, mas reduz variação entre entrevistadores, perguntas indutoras e preenchimento inconsistente.</p>
+ ${trainOpt("Sem treinamento","R$ 0 • 0 h",0,0,0)}
+ ${trainOpt("Briefing de 45 minutos","R$ 180 • 0,75 h",180,.75,1)}
+ ${trainOpt("Treinamento + simulação de entrevista","R$ 650 • 3 h",650,3,2)}
+ ${trainOpt("Treinamento completo + piloto supervisionado","R$ 1.200 • 6 h",1200,6,3)}
+ <button class="btn secondary" onclick="closeModal()">Cancelar</button>`)}
+function trainOpt(n,c,m,t,l){return `<div class="panel"><b>${n}</b><div class="mut">${c}</div><button class="btn primary" onclick="train(${m},${t},${l})">Escolher</button></div>`}
+function train(m,t,l){spend(m);tick(t);s.trained=l>0;s.trainingLevel=l;s.quality.data=clamp(s.quality.data+l*7);s.quality.bias=clamp(s.quality.bias+l*8);addlog(l?`Entrevistadores treinados — nível ${l}.`:"Entrevistas serão iniciadas sem treinamento formal.");closeModal();render()}
+function view_questionnaire(){
+ let base=18+s.q.reduce((a,id)=>a+(questionnaire.find(x=>x.id===id)?.cost||0),0);
+ document.getElementById("view").innerHTML=`<div class="k">Instrumento de investigação</div><h2>Monte o questionário</h2><p class="mut">Cada variável tem custo: aumenta o tempo médio da entrevista e, portanto, o preço unitário. Instrumentos longos também podem aumentar não resposta e fadiga.</p>
+ <div class="panel"><b>Custo atual por entrevista: ${fmt(base)}</b> • duração estimada ${Math.round(5+s.q.length*1.6)} min • ${s.q.length} blocos</div>
+ <div class="qgrid">${questionnaire.map(x=>`<div class="qitem"><label><input type="checkbox" ${s.q.includes(x.id)?"checked":""} onchange="toggleQ('${x.id}')"><span><b>${x.n}</b><br><small class="mut">${x.desc}</small><br><span class="cost">+ ${fmt(x.cost)} por entrevista</span></span></label></div>`).join("")}</div>
+ <div class="row" style="margin-top:13px"><button class="btn secondary" onclick="pilot()">Pilotar em 5 pessoas (R$ 250 + 2 h)</button><button class="btn primary" onclick="go('field')">Ir para campo</button></div>
+ ${s.pilot?`<div class="notice success"><b>Piloto realizado.</b> Foram identificadas ambiguidades na pergunta sobre horário do início dos sintomas e na diferenciação entre “provou” e “consumiu porção”. O instrumento foi ajustado antes da aplicação em escala.</div>`:""}`;
 }
-</script>
-</body></html>
+function toggleQ(id){s.q.includes(id)?s.q=s.q.filter(x=>x!==id):s.q.push(id);render()}
+function pilot(){if(s.pilot)return;s.pilot=true;spend(250);tick(2);s.quality.data=clamp(s.quality.data+8);s.quality.bias=clamp(s.quality.bias+5);addlog("Questionário pilotado em 5 participantes e ajustado.");render()}
+function interviewCost(){return 18+s.q.reduce((a,id)=>a+(questionnaire.find(x=>x.id===id)?.cost||0),0)}
+function view_field(){
+ document.getElementById("view").innerHTML=`<div class="k">Operação de campo</div><h2>Planeje as entrevistas</h2>
+ <p>Há 104 participantes identificáveis no evento. Você decide quantas pessoas abordar. Entrevistar apenas doentes é mais barato, mas muda o que será possível estimar depois.</p>
+ <div class="panel"><b>Custo unitário atual: ${fmt(interviewCost())}</b><br><span class="mut">Treinamento: ${["nenhum","briefing","simulação","completo + piloto"][s.trainingLevel]} • questionário: ${s.q.length} blocos.</span></div>
+ <div class="row"><label>Número a entrevistar <input id="nint" type="number" min="5" max="104" value="${Math.max(20,104-s.interviews)}"></label>
+ <select id="sample"><option value="all">Lista de participantes, independentemente de sintomas</option><option value="cases">Somente pessoas que adoeceram</option><option value="vol">Quem responder voluntariamente ao link</option></select>
+ <button class="btn primary" onclick="runInterviews()">Executar entrevistas</button></div>
+ ${s.interviews?`<div class="notice success">${s.interviews} entrevistas concluídas. ${s.q.includes("foods")?"Exposições alimentares foram registradas.":"O instrumento não coletou consumo dos alimentos; essa informação não estará disponível para análise."}</div>`:""}`;
+}
+function runInterviews(){
+ let n=Math.min(104-s.interviews,Math.max(5,+document.getElementById("nint").value||5));let typ=document.getElementById("sample").value,c=n*interviewCost();
+ if(c>s.money){alert("Orçamento insuficiente para esse número de entrevistas.");return}
+ spend(c);tick(n*(5+s.q.length*1.6)/(60*Math.max(1,s.team)));s.interviews+=n;
+ let tr=s.trainingLevel, core=["onset","symptoms","attendance"].filter(x=>s.q.includes(x)).length;
+ s.quality.data=clamp(s.quality.data+(n/104)*18+tr*2+core*2-(s.q.length>10?6:0));
+ if(typ==="all")s.quality.bias=clamp(s.quality.bias+12); else if(typ==="cases")s.quality.bias=clamp(s.quality.bias-13); else s.quality.bias=clamp(s.quality.bias-18);
+ if(!s.trained)s.quality.data=clamp(s.quality.data-5); if(s.q.includes("open")&&s.rumor)s.quality.bias=clamp(s.quality.bias-3);
+ addlog(`${n} entrevistas realizadas (${typ==="all"?"lista de participantes":typ==="cases"?"somente doentes":"resposta voluntária"}), custo ${fmt(c)}.`);
+ render();
+}
+function view_epi(){
+ let enough=s.interviews>=35, foods=s.q.includes("foods"), onset=s.q.includes("onset");
+ document.getElementById("view").innerHTML=`<div class="k">Epidemiologia</div><h2>Produza evidência a partir do que você coletou</h2>
+ <div class="actiongrid">
+ ${act("Definir caso","Construir definição operacional para classificar registros.","R$ 0 • 1 h","caseDef()")}
+ ${act("Gerar linha de casos",enough?"Organizar registros individuais.":"Poucos registros disponíveis; ainda é possível, mas será incompleta.","1 h","makeLine()")}
+ ${act("Construir curva epidêmica",onset?"Há variável temporal no questionário.":"Você não coletou data/hora de início.","2 h","makeCurve()")}
+ ${act("Calcular taxas de ataque",foods?"Há exposições alimentares registradas.":"Você não coletou os alimentos consumidos.","3 h","makeAnalysis()")}
+ </div>
+ ${s.line?lineHTML():""}${s.curve?curveHTML():""}${s.analysis?analysisHTML():""}`;
+}
+function caseDef(){s.caseDef=true;tick(1);s.quality.data=clamp(s.quality.data+4);addlog("Definição operacional de caso registrada.");render()}
+function makeLine(){s.line=true;tick(1);addlog("Linha de casos produzida a partir das entrevistas disponíveis.");render()}
+function makeCurve(){if(!s.q.includes("onset")){modal("<h2>Dados insuficientes</h2><p>O questionário aplicado não registrou início dos sintomas. Você pode revisar o instrumento e voltar a campo, mas isso terá novo custo.</p><button class='btn primary' onclick=\"closeModal();go('questionnaire')\">Revisar questionário</button>");return}s.curve=true;tick(2);s.quality.data=clamp(s.quality.data+5);addlog("Curva epidêmica construída.");render()}
+function makeAnalysis(){if(!s.q.includes("foods")||s.interviews<25){modal("<h2>Análise limitada</h2><p>Você não possui exposição alimentar suficiente para uma comparação informativa. É possível coletar dados adicionais.</p><button class='btn primary' onclick=\"closeModal();go('field')\">Voltar ao campo</button>");return}s.analysis=true;tick(3);s.quality.data=clamp(s.quality.data+7);s.quality.bias=clamp(s.quality.bias+(s.interviews>75?5:0));addlog("Taxas de ataque e riscos relativos estimados.");render()}
+function lineHTML(){return `<div class="panel"><h3>Linha de casos</h3><table><tr><th>ID</th><th>Início</th><th>Vômito</th><th>Diarreia</th><th>Maionese</th></tr><tr><td>017</td><td>Sab 22:10</td><td>Sim</td><td>Sim</td><td>Sim</td></tr><tr><td>021</td><td>Dom 00:40</td><td>Sim</td><td>Não</td><td>Sim</td></tr><tr><td>034</td><td>Dom 02:15</td><td>Não</td><td>Sim</td><td>Sim</td></tr><tr><td>041</td><td>Sex 19:00</td><td>Não</td><td>Sim</td><td>Não</td></tr></table><div class="mut">Há registros que podem não pertencer ao mesmo evento. A classificação depende da sua definição de caso.</div></div>`}
+function curveHTML(){return `<div class="panel"><h3>Curva por início dos sintomas</h3><div style="display:flex;align-items:end;gap:4px;height:120px">${[1,0,1,2,4,8,11,9,6,3,1,1].map(v=>`<i style="display:block;flex:1;height:${8+v*8}px;background:linear-gradient(#80aaff,#63d4b5);border-radius:4px 4px 0 0"></i>`).join("")}</div><div class="mut">Um registro antecede o evento e um início tardio merece investigação adicional.</div></div>`}
+function analysisHTML(){return `<div class="panel"><h3>Análise preliminar</h3><table><tr><th>Exposição</th><th>TA exp.</th><th>TA não exp.</th><th>RR</th></tr><tr><td>Maionese</td><td>68%</td><td>18%</td><td>3,8</td></tr><tr><td>Frango</td><td>51%</td><td>39%</td><td>1,3</td></tr><tr><td>Suco</td><td>46%</td><td>43%</td><td>1,1</td></tr><tr><td>Água</td><td>${s.q.includes("water")?"44%":"—"}</td><td>${s.q.includes("water")?"47%":"—"}</td><td>${s.q.includes("water")?"0,9":"—"}</td></tr></table><div class="mut">A magnitude pode mudar conforme cobertura, seleção dos entrevistados, definição de caso e qualidade da mensuração.</div></div>`}
+function view_lab(){document.getElementById("view").innerHTML=`<div class="k">Laboratório</div><h2>Escolha quanto testar</h2><p>Você dispõe de casos em diferentes momentos clínicos e algumas sobras alimentares. Cada amostra clínica custa R$ 220; alimento, R$ 360. Coletas tardias podem ter menor rendimento.</p>
+ <div class="row"><label>Amostras clínicas <input id="clin" type="number" min="0" max="20" value="4"></label><label>Amostras de alimentos <input id="foodlab" type="number" min="0" max="6" value="2"></label><button class="btn primary" onclick="runLab()">Coletar e testar</button></div>
+ ${s.lab?`<div class="notice success">${s.lab} amostras processadas. Resultados parciais: parte das amostras clínicas oportunas apresentou agente compatível; amostras tardias foram negativas. A interpretação deve considerar momento e tipo de coleta.</div>`:""}`}
+function runLab(){let a=+document.getElementById("clin").value||0,b=+document.getElementById("foodlab").value||0,c=a*220+b*360;if(c>s.money){alert("Orçamento insuficiente.");return}spend(c);tick(4);s.lab+=a+b;s.quality.data=clamp(s.quality.data+Math.min(10,(a+b)*1.2));addlog(`${a+b} amostras laboratoriais processadas, custo ${fmt(c)}.`);render()}
+function view_inspection(){document.getElementById("view").innerHTML=`<div class="k">Ambiente</div><h2>Inspeção sanitária</h2>${s.inspection?`<div class="notice success">A inspeção identificou registros incompletos de temperatura e relato de permanência prolongada de preparação com maionese fora de refrigeração. Não é prova isolada de causalidade.</div>`:`<p>A inspeção custa R$ 900 e mobiliza profissionais por aproximadamente 5 horas. O rendimento pode diminuir se for feita tardiamente, após limpeza e descarte de alimentos.</p><button class="btn primary" onclick="doInspection()">Realizar inspeção</button>`}`}
+function doInspection(){if(s.inspection)return;if(s.money<900){alert("Orçamento insuficiente.");return}s.inspection=true;spend(900);tick(5);s.quality.data=clamp(s.quality.data+9);addlog("Inspeção sanitária realizada; falha de controle de temperatura documentada.");s.view="inspection";render()}
+function view_control(){document.getElementById("view").innerHTML=`<div class="k">Decisão</div><h2>Controle e comunicação</h2><p>Você pode implementar medidas a qualquer momento. A qualidade da decisão depende do conjunto de evidências que você produziu e do atraso acumulado.</p>
+ <div class="actiongrid">
+ ${act("Orientação geral","Higiene, procura de assistência, comunicação aos participantes.","R$ 150","controlAct('general')")}
+ ${act("Interromper alimento/processo suspeito","Suspender preparo/lote e corrigir conservação.","R$ 450","controlAct('target')")}
+ ${act("Fechar toda a escola","Suspensão ampla das atividades por 7 dias.","R$ 2.500","controlAct('close')")}
+ ${act("Notificar/atualizar autoridades","Formalizar evento e situação da investigação.","R$ 0 • 0,5 h","report()")}
+ </div>${s.control?`<div class="notice success">Há medidas de controle ativas. Continue monitorando aparecimento de novos casos.</div>`:""}`}
+function controlAct(x){let c=x==="general"?150:x==="target"?450:2500;if(s.money<c){alert("Orçamento insuficiente.");return}spend(c);tick(1);s.control=true;if(x==="target"&&(s.analysis||s.inspection)){s.quality.control=clamp(s.quality.control+25);s.quality.opportunity=clamp(s.quality.opportunity+8)}else if(x==="close"){s.quality.control=clamp(s.quality.control-8);s.quality.opportunity=clamp(s.quality.opportunity-4)}else{s.quality.control=clamp(s.quality.control+8)}addlog("Medida de controle implementada.");render()}
+function report(){if(s.reported)return;s.reported=true;tick(.5);s.quality.control=clamp(s.quality.control+5);addlog("Evento comunicado/atualizado formalmente.");render()}
+function view_close(){let avg=Math.round(Object.values(s.quality).reduce((a,b)=>a+b,0)/4);document.getElementById("view").innerHTML=`<div class="k">Debriefing disponível a qualquer momento</div><h2>Encerrar investigação?</h2><p>Você pode encerrar agora, mesmo com lacunas. O jogo avaliará não apenas a conclusão, mas como seus recursos e decisões produziram — ou não — evidência suficiente.</p>
+ <div class="panel"><b>Estado atual</b><br>Orçamento restante: ${fmt(s.money)} • Dia ${Math.floor(((Date.now()-s.clockStartedAt)/60000)+(s.time/24))+1} do cenário • ${s.interviews} entrevistas • ${s.lab} amostras.<br>Indicador provisório de investigação: ${avg}/100.</div>
+ <button class="btn primary" onclick="debrief()">Encerrar e ver debriefing</button>`}
+function debrief(){let avg=Math.round(Object.values(s.quality).reduce((a,b)=>a+b,0)/4),issues=[];
+ if(!s.trained)issues.push("Entrevistadores não receberam treinamento formal; maior risco de heterogeneidade na aplicação.");
+ if(!s.pilot)issues.push("O instrumento não foi pilotado antes da aplicação em escala.");
+ if(s.interviews<70)issues.push("Cobertura de entrevistas limitada para uma população enumerada de 104 participantes.");
+ if(!s.q.includes("foods"))issues.push("O questionário não coletou exposições alimentares específicas, limitando o teste da principal classe de hipóteses.");
+ if(!s.q.includes("water"))issues.push("Água não foi incluída como exposição alternativa.");
+ if(!s.analysis)issues.push("A investigação foi encerrada sem análise comparativa das exposições.");
+ if(!s.inspection)issues.push("Não houve inspeção ambiental/documental da preparação dos alimentos.");
+ if(!s.control)issues.push("Nenhuma medida específica de controle foi registrada.");
+ document.getElementById("view").innerHTML=`<div class="k">Debriefing</div><h2>Resultado da sua investigação: ${avg}/100</h2>
+ <div class="statgrid"><div class="stat"><small>Gasto</small><b>${fmt(8000-s.money)}</b></div><div class="stat"><small>Tempo do cenário</small><b>Dia ${Math.floor(((Date.now()-s.clockStartedAt)/60000)+(s.time/24))+1}</b></div><div class="stat"><small>Entrevistas</small><b>${s.interviews}</b></div><div class="stat"><small>Custo/entrevista</small><b>${fmt(interviewCost())}</b></div></div>
+ <div class="panel"><h3>Principais fragilidades</h3>${issues.length?`<ul>${issues.map(x=>`<li>${x}</li>`).join("")}</ul>`:"<p class='good'>A investigação cobriu os principais componentes previstos neste cenário.</p>"}</div>
+ <div class="panel"><h3>Princípio do cenário</h3><p>Mais informação não é automaticamente melhor. O desempenho depende de obter informação discriminante com custo e tempo aceitáveis, reduzir vieses, preservar comparabilidade e agir quando a evidência é suficiente para uma medida proporcional.</p></div>
+ <button class="btn primary" onclick="resetGame()">Jogar novamente com outra estratégia</button>`}
+function modal(x){document.getElementById("modalbox").innerHTML=x;document.getElementById("modal").classList.add("show")}function closeModal(){document.getElementById("modal").classList.remove("show")}
+function resetGame(){s=S0();render()}
+setInterval(()=>{if(s && !document.hidden){render();}},1000);
+render();
+</script></body></html>
