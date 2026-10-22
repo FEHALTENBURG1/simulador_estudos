@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIGIA — Simulador de Investigação de Surtos</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1823;--panel2:#122130;--line:#24384a;--text:#edf5fb;
+  --muted:#9eb0bf;--accent:#62d0b4;--accent2:#79a9ff;--warn:#ffd166;--bad:#ff7b7b;
+  --good:#7be0a3;--shadow:0 18px 50px rgba(0,0,0,.28);--r:18px
+}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#061019,#09141f 45%,#071019);
+color:var(--text);font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit}.wrap{max-width:1440px;margin:auto;padding:22px}
+header{display:flex;gap:18px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.brand{display:flex;gap:14px;align-items:center}.logo{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;
+background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04131a;font-weight:900;font-size:22px;box-shadow:var(--shadow)}
+h1{font-size:clamp(22px,3vw,34px);margin:0}.sub{color:var(--muted);margin-top:3px}
+.pill{border:1px solid var(--line);background:#0b1721;border-radius:999px;padding:8px 12px;color:var(--muted);white-space:nowrap}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px}
+.card{background:rgba(13,24,35,.95);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.main{padding:24px}.side{padding:18px;position:sticky;top:18px;height:max-content}
+.kicker{text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-size:12px;font-weight:800}
+h2{font-size:clamp(24px,3vw,38px);line-height:1.12;margin:7px 0 10px} h3{margin:0 0 10px;font-size:18px}
+.lead{font-size:18px;color:#d8e5ee;max-width:900px}.muted{color:var(--muted)}
+.alert{padding:15px 17px;border-radius:14px;background:#102436;border:1px solid #294863;margin:18px 0}
+.options{display:grid;gap:11px;margin-top:20px}.opt{width:100%;text-align:left;padding:15px 16px;border-radius:14px;border:1px solid var(--line);
+background:#0b1722;color:var(--text);cursor:pointer;transition:.15s}.opt:hover{transform:translateY(-1px);border-color:#50708b;background:#102131}
+.opt b{display:block;margin-bottom:3px}.opt span{color:var(--muted);font-size:14px}
+.opt:disabled{opacity:.62;cursor:not-allowed;transform:none}.feedback{margin-top:18px;padding:17px;border-radius:14px;border:1px solid var(--line);display:none}
+.feedback.good{display:block;background:#0e2a22;border-color:#275f4b}.feedback.ok{display:block;background:#2a2513;border-color:#6b5b20}
+.feedback.bad{display:block;background:#2d171a;border-color:#6c3036}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer}.primary{background:var(--accent);color:#052019}
+.secondary{background:#152535;color:var(--text);border:1px solid var(--line)}.danger{background:#2b171a;color:#ffdede;border:1px solid #613137}
+.metric{margin:12px 0}.metric-top{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}.bar{height:8px;background:#08111a;border-radius:99px;overflow:hidden;margin-top:6px}
+.fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:.3s}
+.resources{display:grid;grid-template-columns:1fr 1fr;gap:8px}.res{padding:10px;border-radius:12px;background:#0a151f;border:1px solid var(--line)}
+.res small{display:block;color:var(--muted)}.res strong{font-size:18px}.tools{display:grid;gap:8px}.tool{padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:#0a151f}
+.tool.lock{opacity:.42;filter:saturate(.4)}.tool small{display:block;color:var(--muted)}
+.sep{height:1px;background:var(--line);margin:17px 0}.timeline{display:flex;gap:7px;margin:16px 0 22px;overflow:auto;padding-bottom:3px}
+.step{min-width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#0a151f;border:1px solid var(--line);color:var(--muted);font-size:13px}
+.step.done{background:#12342b;border-color:#2c725d;color:#cffff1}.step.now{outline:2px solid var(--accent);color:white}
+.data-box{display:none;margin-top:18px;padding:16px;border-radius:14px;background:#09151f;border:1px solid var(--line)}
+.data-box.show{display:block}.mini-table{width:100%;border-collapse:collapse;font-size:14px}.mini-table th,.mini-table td{padding:8px;border-bottom:1px solid var(--line);text-align:left}
+.spark{display:flex;align-items:end;gap:4px;height:110px;margin:15px 0}.spark i{display:block;flex:1;min-width:10px;background:linear-gradient(var(--accent2),var(--accent));border-radius:5px 5px 1px 1px}
+.badge{display:inline-block;border:1px solid var(--line);padding:4px 8px;border-radius:999px;color:var(--muted);font-size:12px;margin-right:5px}
+.start{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:22px}.case{padding:18px;border:1px solid var(--line);border-radius:16px;background:#0b1722}
+.case.lock{opacity:.55}.case h3{font-size:20px}.case .btn{margin-top:12px;width:100%}
+.debrief{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0}.score{padding:14px;border:1px solid var(--line);border-radius:14px;text-align:center;background:#09151f}
+.score strong{display:block;font-size:25px}.score small{color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}.hidden{display:none!important}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.side{position:static}.start{grid-template-columns:1fr}.debrief{grid-template-columns:1fr 1fr}.pill{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">V</div><div><h1>VIGIA</h1><div class="sub">Simulador de Investigação de Surtos e Vigilância Epidemiológica</div></div></div>
+  <div class="pill" id="modePill">Modo investigação • protótipo funcional</div>
+</header>
+
+<div id="home" class="card main">
+  <div class="kicker">Aprendizagem baseada em decisão</div>
+  <h2>Investigue antes que o evento avance.</h2>
+  <p class="lead">Você recebe sinais incompletos, administra recursos limitados, constrói a investigação e decide quando agir. O objetivo não é adivinhar um desenho de estudo: é tomar decisões epidemiológicas defensáveis no tempo certo.</p>
+  <div class="alert"><b>Como funciona:</b> cada decisão altera tempo, orçamento, capacidade da equipe e qualidade da investigação. Recursos da Sala de Situação são desbloqueados conforme você produz informação.</div>
+  <div class="start">
+    <div class="case">
+      <span class="badge">Introdutório</span><span class="badge">Surto alimentar</span>
+      <h3>Almoço na Escola Horizonte</h3>
+      <p class="muted">Vômitos e diarreia em estudantes após uma atividade escolar. Trabalhe alerta, definição de caso, linha de casos, curva epidêmica, hipótese, coorte retrospectiva e controle.</p>
+      <button class="btn primary" onclick="startGame()">Iniciar investigação</button>
+    </div>
+    <div class="case lock">
+      <span class="badge">Intermediário</span><span class="badge">Respiratório</span>
+      <h3>Instituição de longa permanência</h3>
+      <p class="muted">Cluster respiratório, busca ativa, testagem, isolamento, contatos e monitoramento.</p>
+      <button class="btn secondary" disabled>Em desenvolvimento</button>
+    </div>
+    <div class="case lock">
+      <span class="badge">Avançado</span><span class="badge">Sarampo</span>
+      <h3>Caso importado e contatos</h3>
+      <p class="muted">Notificação imediata, período de transmissibilidade, contatos, vacinação e vigilância ativa.</p>
+      <button class="btn secondary" disabled>Em desenvolvimento</button>
+    </div>
+  </div>
+</div>
+
+<div id="game" class="grid hidden">
+  <main class="card main">
+    <div class="timeline" id="timeline"></div>
+    <div class="kicker" id="phase"></div>
+    <h2 id="title"></h2>
+    <p class="lead" id="story"></p>
+    <div id="context" class="alert"></div>
+    <div id="dataBox" class="data-box"></div>
+    <div id="options" class="options"></div>
+    <div id="feedback" class="feedback"></div>
+    <div class="actions">
+      <button id="nextBtn" class="btn primary hidden" onclick="nextStep()">Continuar</button>
+      <button class="btn secondary" onclick="toggleResource()">Abrir recurso disponível</button>
+      <button class="btn danger" onclick="restart()">Reiniciar caso</button>
+    </div>
+  </main>
+
+  <aside class="card side">
+    <h3>Sala de Situação</h3>
+    <div class="resources">
+      <div class="res"><small>Tempo decorrido</small><strong id="rTime">0 h</strong></div>
+      <div class="res"><small>Orçamento</small><strong id="rMoney">100</strong></div>
+      <div class="res"><small>Equipe</small><strong id="rTeam">100</strong></div>
+      <div class="res"><small>Amostras lab.</small><strong id="rLab">12</strong></div>
+    </div>
+    <div class="sep"></div>
+    <h3>Desempenho</h3>
+    <div id="metrics"></div>
+    <div class="sep"></div>
+    <h3>Recursos de investigação</h3>
+    <div class="tools" id="tools"></div>
+    <p class="note">Recursos são desbloqueados pela investigação. Nem todo recurso precisa ser usado; solicitar informação desnecessária também tem custo.</p>
+  </aside>
+</div>
+</div>
+
+<script>
+const metricNames={vig:"Vigilância",rig:"Rigor epidemiológico",opp:"Oportunidade",ctrl:"Controle",eff:"Uso de recursos"};
+const toolDefs=[
+ {id:"alerta",name:"Registro do alerta",desc:"Origem, horário e informação inicial"},
+ {id:"linha",name:"Linha de casos",desc:"Pessoa, lugar, tempo, clínica e exposições"},
+ {id:"curva",name:"Curva epidêmica",desc:"Distribuição dos casos por início dos sintomas"},
+ {id:"mapa",name:"Mapa / lugar",desc:"Distribuição espacial e locais de exposição"},
+ {id:"lab",name:"Laboratório",desc:"Amostras e resultados disponíveis"},
+ {id:"entrevista",name:"Entrevistas",desc:"Exposições e informações qualitativas"},
+ {id:"analise",name:"Análise epidemiológica",desc:"Taxas de ataque e medidas de associação"},
+ {id:"controle",name:"Medidas de controle",desc:"Ações implementadas e monitoramento"}
+];
+
+const steps=[
+{
+ phase:"1 • Alerta e verificação", title:"Um telefonema chega à vigilância",
+ story:"Segunda-feira, 08h10. A direção da Escola Horizonte informa que 14 estudantes apresentaram vômitos e diarreia desde a noite anterior. No sábado, 96 estudantes e 8 trabalhadores participaram de uma atividade com almoço coletivo.",
+ context:"Você ainda não sabe se todos os casos estão relacionados, qual é o agente ou se o número observado excede o esperado.",
+ unlock:["alerta"],
+ options:[
+  {t:"Registrar o alerta, obter informações mínimas e iniciar verificação do evento",s:"Define pessoa, lugar, tempo, sintomas, gravidade e contatos iniciais antes de mobilizar toda a resposta.",q:"good",d:{time:1,money:-2,team:-3,vig:8,rig:5,opp:7,eff:5}},
+  {t:"Aguardar confirmação laboratorial antes de iniciar a investigação",s:"A confirmação etiológica pode ser importante, mas não é pré-requisito para verificar um possível surto nem para iniciar ações oportunas.",q:"bad",d:{time:12,opp:-14,vig:-7,eff:1}},
+  {t:"Enviar imediatamente toda a equipe para coletar amostras de todos os participantes",s:"Mobilização precoce e indiscriminada consome capacidade antes de definir quem deve ser investigado e quais amostras são informativas.",q:"ok",d:{time:3,money:-15,team:-15,lab:-6,opp:2,eff:-12}}
+ ]},
+{
+ phase:"2 • Definição de caso", title:"Quem será considerado caso?",
+ story:"A verificação confirma quadro gastrointestinal agudo em vários participantes do mesmo evento. Há pessoas com apenas náusea e outras com vômitos e/ou diarreia.",
+ context:"A definição deve ser operacional, aplicável à busca ativa e suficientemente específica para esta etapa, sem depender obrigatoriamente do laboratório.",
+ unlock:["linha"],
+ options:[
+  {t:"Participante do evento de sábado que apresentou vômito e/ou ≥3 evacuações líquidas em 24 h, com início entre sábado à tarde e terça-feira",s:"Combina pessoa, lugar/exposição, critérios clínicos e tempo. Pode ser refinada à medida que novas informações surgirem.",q:"good",d:{time:1,rig:10,vig:7,opp:4,eff:3}},
+  {t:"Qualquer morador do bairro com sintomas gastrointestinais nesta semana",s:"A definição é ampla demais para a investigação inicial e pode incorporar casos não relacionados ao evento.",q:"bad",d:{time:2,rig:-10,team:-6,eff:-5}},
+  {t:"Somente participante com exame laboratorial positivo",s:"Alta especificidade, porém baixa sensibilidade operacional no início; atrasaria a busca ativa e excluiria casos epidemiologicamente compatíveis.",q:"ok",d:{time:6,rig:-2,opp:-8,vig:-4}}
+ ]},
+{
+ phase:"3 • Busca ativa e descrição", title:"Como encontrar a extensão real do evento?",
+ story:"A escola fornece lista nominal dos 104 participantes, telefones, turma/setor e cardápio servido. Até agora, somente famílias que procuraram a escola foram contabilizadas.",
+ context:"Você pode organizar uma busca ativa estruturada. A lista completa dos participantes também cria um denominador conhecido.",
+ unlock:["entrevista","curva"],
+ data:"line",
+ options:[
+  {t:"Contatar sistematicamente os 104 participantes usando formulário padronizado e registrar doentes e não doentes",s:"A estratégia reduz viés de seleção, identifica denominadores e permite comparar exposições entre participantes.",q:"good",d:{time:8,money:-8,team:-18,vig:10,rig:10,opp:4,eff:4}},
+  {t:"Entrevistar apenas os 14 casos já conhecidos",s:"Ajuda a descrever os doentes, mas impede estimar taxas de ataque por exposição e pode perder casos que não procuraram a escola.",q:"ok",d:{time:3,team:-5,rig:-5,vig:-4,eff:2}},
+  {t:"Publicar um formulário aberto nas redes sociais e usar apenas respostas espontâneas",s:"Pode gerar seleção difícil de quantificar e perde o denominador definido do evento, que já está disponível.",q:"bad",d:{time:5,money:-2,rig:-11,vig:-5,eff:-4}}
+ ]},
+{
+ phase:"4 • Tempo, pessoa e lugar", title:"Os dados começam a formar um padrão",
+ story:"A busca ativa identifica 47 pessoas que atendem à definição de caso. A maioria iniciou sintomas entre 8 e 20 horas após o almoço. Não houve concentração clara por turma.",
+ context:"Antes de testar hipóteses, descreva o evento. A curva epidêmica e a distribuição das exposições podem orientar a investigação.",
+ unlock:["mapa"],
+ data:"curve",
+ options:[
+  {t:"Interpretar o padrão temporal, caracterizar pessoa e lugar e então formular hipóteses de fonte comum",s:"A concentração dos inícios em intervalo relativamente curto após uma exposição compartilhada é compatível com fonte comum pontual e orienta as hipóteses.",q:"good",d:{time:2,rig:9,vig:6,opp:4}},
+  {t:"Concluir que o alimento foi a causa apenas porque houve almoço coletivo",s:"O almoço é uma hipótese plausível, não uma conclusão. É necessário examinar exposições específicas e evidências epidemiológicas/laboratoriais.",q:"bad",d:{time:1,rig:-12,ctrl:-3}},
+  {t:"Ignorar o tempo de início e comparar somente o número de casos por turma",s:"Perde-se uma dimensão essencial para compreender o padrão de transmissão e orientar hipóteses.",q:"bad",d:{time:2,rig:-9,vig:-5}}
+ ]},
+{
+ phase:"5 • Hipóteses e laboratório", title:"Qual informação vale coletar agora?",
+ story:"Entrevistas apontam que salada de maionese, frango, arroz, feijão e suco foram servidos. Parte dos trabalhadores da cozinha guardou sobras refrigeradas. Alguns casos ainda estão sintomáticos.",
+ context:"Você dispõe de 12 unidades de capacidade laboratorial. O laboratório pode apoiar a investigação, mas não substitui a análise epidemiológica.",
+ unlock:["lab"],
+ options:[
+  {t:"Priorizar amostras clínicas oportunas de alguns casos e amostras de alimentos remanescentes pertinentes, articulando com o laboratório",s:"Amostragem dirigida preserva recursos e aumenta a chance de produzir informação útil, respeitando oportunidade e pertinência da coleta.",q:"good",d:{time:3,money:-12,team:-5,lab:-7,rig:7,opp:4,eff:8}},
+  {t:"Coletar 12 amostras aleatórias, independentemente de sintomas, tempo e tipo de material",s:"Usar toda a capacidade não significa produzir mais evidência. A escolha do material e do momento de coleta é parte da estratégia.",q:"bad",d:{time:5,money:-18,team:-8,lab:-12,rig:-7,eff:-12}},
+  {t:"Não coletar nenhuma amostra porque a epidemiologia será suficiente",s:"A investigação epidemiológica pode sustentar medidas, mas a oportunidade de obter evidência laboratorial relevante não deve ser descartada sem justificativa.",q:"ok",d:{time:1,money:0,rig:-3,eff:3}}
+ ]},
+{
+ phase:"6 • Investigação analítica", title:"Como testar a hipótese?",
+ story:"Você tem a lista completa de participantes, sabe quem adoeceu e dispõe das exposições alimentares de doentes e não doentes.",
+ context:"A pergunta agora é analítica: qual alimento está associado ao adoecimento entre os participantes do evento?",
+ unlock:["analise"],
+ data:"attack",
+ options:[
+  {t:"Realizar uma coorte retrospectiva e comparar taxas de ataque entre expostos e não expostos, estimando risco relativo",s:"A população exposta está enumerada e o status de exposição e desfecho pode ser reconstruído. O RR é diretamente interpretável neste cenário.",q:"good",d:{time:5,team:-8,rig:12,vig:4,eff:6}},
+  {t:"Fazer um estudo ecológico usando cada turma como unidade de análise",s:"É possível estudar grupos, mas isso desperdiça informação individual disponível e introduz limitações desnecessárias para esta pergunta.",q:"ok",d:{time:4,rig:-6,eff:-4}},
+  {t:"Selecionar apenas casos e calcular a porcentagem que comeu cada alimento",s:"Frequência de exposição entre casos, sem grupo comparável, não estima a associação necessária para discriminar o veículo provável.",q:"bad",d:{time:3,rig:-12,eff:-5}}
+ ]},
+{
+ phase:"7 • Decisão de controle", title:"Agir agora ou esperar?",
+ story:"A análise mostra associação forte com a salada de maionese. A inspeção identifica falha de refrigeração. Resultados laboratoriais definitivos ainda não estão disponíveis.",
+ context:"A vigilância precisa equilibrar certeza, proporcionalidade e oportunidade. Medidas de controle podem ser necessárias antes da confirmação etiológica final.",
+ unlock:["controle"],
+ options:[
+  {t:"Interromper o uso do lote/ingrediente implicado, corrigir a falha de conservação, orientar a escola e manter monitoramento dos casos",s:"As medidas são proporcionais às evidências disponíveis e atuam sobre uma via plausível sem depender de certeza etiológica absoluta.",q:"good",d:{time:2,money:-6,team:-5,ctrl:14,opp:12,vig:5,eff:5}},
+  {t:"Esperar todos os resultados laboratoriais antes de qualquer medida",s:"Atrasar medidas plausíveis diante de evidência epidemiológica consistente pode prolongar a exposição e reduzir a efetividade da resposta.",q:"bad",d:{time:24,opp:-16,ctrl:-12}},
+  {t:"Fechar a escola por 30 dias sem avaliação adicional",s:"A medida é desproporcional ao mecanismo sugerido e impõe alto custo sem evidência de benefício adicional.",q:"bad",d:{time:1,money:-25,ctrl:-5,eff:-16}}
+ ]},
+{
+ phase:"8 • Comunicação e encerramento", title:"Como fechar o ciclo de vigilância?",
+ story:"Não surgem novos casos após as medidas. O laboratório detecta agente compatível em amostras clínicas e no alimento remanescente. A escola solicita orientação formal.",
+ context:"Encerrar uma investigação inclui comunicação, documentação das evidências, recomendações e critérios de monitoramento.",
+ options:[
+  {t:"Consolidar relatório com métodos, achados, limitações, medidas adotadas e recomendações; comunicar envolvidos e definir período de monitoramento",s:"A resposta fecha o ciclo entre detecção, investigação, controle, comunicação e aprendizado institucional.",q:"good",d:{time:4,team:-6,vig:10,rig:5,ctrl:8,eff:3}},
+  {t:"Arquivar o caso porque o agente já foi identificado",s:"A identificação etiológica não substitui documentação, comunicação e avaliação das medidas.",q:"bad",d:{time:1,vig:-10,ctrl:-6}},
+  {t:"Divulgar imediatamente nomes e dados individuais dos casos para demonstrar transparência",s:"Comunicação de risco deve informar o necessário sem exposição indevida de dados pessoais.",q:"bad",d:{time:1,vig:-7,rig:-3}}
+ ]}
+];
+
+let state;
+function baseState(){return {i:0,time:0,money:100,team:100,lab:12,metrics:{vig:50,rig:50,opp:50,ctrl:50,eff:50},tools:[],answered:false,history:[]}}
+function clamp(v){return Math.max(0,Math.min(100,v))}
+function startGame(){state=baseState();document.getElementById("home").classList.add("hidden");document.getElementById("game").classList.remove("hidden");render()}
+function restart(){state=baseState();render()}
+function render(){
+ const s=steps[state.i]; if(!s){finish();return}
+ (s.unlock||[]).forEach(x=>{if(!state.tools.includes(x))state.tools.push(x)});
+ document.getElementById("phase").textContent=s.phase;
+ document.getElementById("title").textContent=s.title;
+ document.getElementById("story").textContent=s.story;
+ document.getElementById("context").innerHTML="<b>Situação:</b> "+s.context;
+ document.getElementById("feedback").className="feedback";document.getElementById("feedback").innerHTML="";
+ document.getElementById("nextBtn").classList.add("hidden");state.answered=false;
+ document.getElementById("options").innerHTML=s.options.map((o,j)=>`<button class="opt" onclick="choose(${j})"><b>${String.fromCharCode(65+j)}. ${o.t}</b><span>Escolha esta conduta</span></button>`).join("");
+ renderTimeline();renderSide();renderData(s.data,false);
+}
+function choose(j){
+ if(state.answered)return;state.answered=true;
+ const s=steps[state.i],o=s.options[j];state.history.push({step:state.i,q:o.q,text:o.t});
+ Object.entries(o.d||{}).forEach(([k,v])=>{
+   if(k==="time")state.time+=v; else if(k==="money")state.money=Math.max(0,state.money+v);
+   else if(k==="team")state.team=Math.max(0,state.team+v); else if(k==="lab")state.lab=Math.max(0,state.lab+v);
+   else if(state.metrics[k]!=null)state.metrics[k]=clamp(state.metrics[k]+v)
+ });
+ document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+ const f=document.getElementById("feedback");f.className="feedback "+o.q;
+ f.innerHTML=`<b>${o.q==="good"?"Decisão adequada":o.q==="ok"?"Decisão defensável, com limitações":"Decisão inadequada"}</b><br>${o.s}`;
+ document.getElementById("nextBtn").classList.remove("hidden");renderSide();renderData(s.data,true);
+}
+function nextStep(){state.i++;render()}
+function renderTimeline(){document.getElementById("timeline").innerHTML=steps.map((_,i)=>`<div class="step ${i<state.i?"done":i===state.i?"now":""}">${i+1}</div>`).join("")}
+function renderSide(){
+ document.getElementById("rTime").textContent=state.time+" h";document.getElementById("rMoney").textContent=state.money;
+ document.getElementById("rTeam").textContent=state.team;document.getElementById("rLab").textContent=state.lab;
+ document.getElementById("metrics").innerHTML=Object.entries(state.metrics).map(([k,v])=>`<div class="metric"><div class="metric-top"><span>${metricNames[k]}</span><b>${Math.round(v)}</b></div><div class="bar"><div class="fill" style="width:${v}%"></div></div></div>`).join("");
+ document.getElementById("tools").innerHTML=toolDefs.map(t=>`<div class="tool ${state.tools.includes(t.id)?"":"lock"}"><b>${state.tools.includes(t.id)?"✓":"🔒"} ${t.name}</b><small>${t.desc}</small></div>`).join("");
+}
+function renderData(type,reveal){
+ const b=document.getElementById("dataBox"); if(!type){b.className="data-box";b.innerHTML="";return}
+ b.className="data-box"+(reveal?" show":"");
+ if(type==="line")b.innerHTML=`<h3>Recurso • linha de casos</h3><table class="mini-table"><tr><th>ID</th><th>Início</th><th>Vômitos</th><th>Diarreia</th><th>Maionese</th></tr><tr><td>01</td><td>Sab 22:10</td><td>Sim</td><td>Sim</td><td>Sim</td></tr><tr><td>02</td><td>Dom 00:40</td><td>Sim</td><td>Não</td><td>Sim</td></tr><tr><td>03</td><td>Dom 02:15</td><td>Não</td><td>Sim</td><td>Sim</td></tr></table><p class="note">Trecho ilustrativo. A linha completa contém casos e não casos entrevistados.</p>`;
+ if(type==="curve"){let vals=[0,0,1,2,5,9,12,10,5,2,1,0];b.innerHTML=`<h3>Recurso • curva epidêmica</h3><div class="spark">${vals.map(v=>`<i style="height:${8+v*7}px" title="${v} casos"></i>`).join("")}</div><p class="note">Casos por intervalo de início dos sintomas. Observe a concentração temporal após a exposição comum.</p>`}
+ if(type==="attack")b.innerHTML=`<h3>Recurso • tabela preliminar de exposição</h3><table class="mini-table"><tr><th>Alimento</th><th>TA expostos</th><th>TA não expostos</th><th>RR preliminar</th></tr><tr><td>Salada de maionese</td><td>72%</td><td>14%</td><td>5,1</td></tr><tr><td>Frango</td><td>48%</td><td>41%</td><td>1,2</td></tr><tr><td>Suco</td><td>46%</td><td>44%</td><td>1,0</td></tr></table><p class="note">Valores didáticos do cenário. A interpretação deve considerar qualidade da coleta, incerteza e plausibilidade epidemiológica.</p>`;
+}
+function toggleResource(){const b=document.getElementById("dataBox");if(!b.innerHTML){b.innerHTML="<h3>Recursos ainda em construção</h3><p class='muted'>Nesta etapa, consulte os recursos já desbloqueados na Sala de Situação. Dados adicionais aparecem quando são produzidos pela investigação.</p>"}b.classList.toggle("show")}
+function finish(){
+ const avg=Math.round(Object.values(state.metrics).reduce((a,b)=>a+b,0)/5);
+ const main=document.querySelector("main.main");
+ main.innerHTML=`<div class="kicker">Debriefing</div><h2>Investigação encerrada</h2>
+ <p class="lead">O evento foi controlado. Agora o objetivo é reconstruir o raciocínio, não apenas contar acertos.</p>
+ <div class="debrief">${Object.entries(state.metrics).map(([k,v])=>`<div class="score"><strong>${Math.round(v)}</strong><small>${metricNames[k]}</small></div>`).join("")}</div>
+ <div class="alert"><b>Desempenho global: ${avg}/100.</b> Tempo decorrido: ${state.time} h. Orçamento remanescente: ${state.money}. Capacidade laboratorial remanescente: ${state.lab}.</div>
+ <h3>Raciocínio epidemiológico esperado</h3>
+ <p>A investigação parte da verificação do alerta, constrói definição operacional de caso, realiza busca ativa com denominador conhecido, descreve tempo–pessoa–lugar, formula hipóteses e utiliza uma <b>coorte retrospectiva</b> para comparar taxas de ataque entre expostos e não expostos. As medidas de controle não precisam aguardar certeza etiológica absoluta quando a evidência disponível é suficiente e a ação é proporcional.</p>
+ <h3>Recursos produzidos</h3><p class="muted">Registro do alerta • linha de casos • entrevistas • curva epidêmica • análise por lugar • laboratório • taxas de ataque/RR • registro das medidas de controle.</p>
+ <div class="actions"><button class="btn primary" onclick="location.reload()">Voltar ao início</button></div>`;
+ renderSide();
+}
+</script>
+</body></html>
